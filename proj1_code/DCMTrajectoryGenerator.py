@@ -80,7 +80,7 @@ class DCMTrajectoryGenerator:
     def planDCMForSingleSupport(self): #The output of this function is a DCM vector with a size of (int(self.numberOfSamplesPerSecond* self.stepDuration * self.CoP.shape[0])) that is number of sample points for whole time of walking
         for iter in range(int(self.numberOfSamplesPerSecond* self.stepDuration * self.CoP.shape[0])):# We iterate on the whole simulation control cycles:  
             time = iter*self.timeStep  #Finding the time of a corresponding control cycle
-            i = time//self.stepDuration #Finding the number of corresponding step of walking
+            i = int(time/self.stepDuration) #Finding the number of corresponding step of walking
             t = time%self.stepDuration #The “internal” step time t is reset at the beginning of each step
             self.DCM.append(self.CoP[i]+(self.DCMForEndOfStep[i]-self.CoP[i])*exp(self.omega(t-self.stepDuration))) #Use equation (9) for finding the DCM trajectory
             
@@ -150,9 +150,9 @@ class DCMTrajectoryGenerator:
         for stepNumber in range(self.CoP.shape[0]):
             if stepNumber == 0:
                 #the first step starts with double support and notice double support duration is not the same as other steps
-                DCMCompleteTrajectory[                                ] = listOfDoubleSupportTrajectories[stepNumber][:]#fill the corresponding interval for DCM index for double support part
+                DCMCompleteTrajectory[0:int((1-self.alpha)*self.dsTime*(1/self.timeStep))] = listOfDoubleSupportTrajectories[stepNumber][:]#fill the corresponding interval for DCM index for double support part
             else: 
-                DCMCompleteTrajectory[                                ] = listOfDoubleSupportTrajectories[stepNumber][:]
+                DCMCompleteTrajectory[int((1-self.alpha)*self.dsTime*(1/self.timeStep))+1:int(self.dsTime*(1/self.timeStep))] = listOfDoubleSupportTrajectories[stepNumber][:]
         
         self.DCM = DCMCompleteTrajectory
         temp = np.array(self.DCM)
