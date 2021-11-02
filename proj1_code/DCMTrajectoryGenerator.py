@@ -153,7 +153,8 @@ class DCMTrajectoryGenerator:
                 #the first step starts with double support and notice double support duration is not the same as other steps
                 DCMCompleteTrajectory[0:int((1-self.alpha)*self.dsTime*(1/self.timeStep))] = listOfDoubleSupportTrajectories[stepNumber][:]#fill the corresponding interval for DCM index for double support part
             else: 
-                DCMCompleteTrajectory[int((1-self.alpha)*self.dsTime*(1/self.timeStep))+1:int(self.dsTime*(1/self.timeStep))] = listOfDoubleSupportTrajectories[stepNumber][:]
+                DCMCompleteTrajectory[(int(stepNumber*self.stepDuration - (self.alpha)*self.dsTime*(1/self.timeStep))):
+                                      (int(stepNumber*self.stepDuration + (1-self.alpha)*self.dsTime*(1/self.timeStep)))] = listOfDoubleSupportTrajectories[stepNumber][:]
         
         self.DCM = DCMCompleteTrajectory
         temp = np.array(self.DCM)
