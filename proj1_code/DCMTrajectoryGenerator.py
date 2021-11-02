@@ -144,7 +144,8 @@ class DCMTrajectoryGenerator:
                 doubleSupportTrajectory = np.zeros((int(self.dsTime*(1/self.timeStep)),3))
                 for t in range(int(self.dsTime*(1/self.timeStep))):
                     # ATTENTION ! CE N'EST SUREMENT PAS LES MÊMES T, UN EST L'INDICE, L'AUTRE LE TEMPS
-                    doubleSupportTrajectory[t] = (t**3)*a + (t**2)*b + t*c + d#use equation 16 (only the DCM position component)
+                    realT = t*self.timeStep
+                    doubleSupportTrajectory[t] = (realT**3)*a + (realT**2)*b + realT*c + d#use equation 16 (only the DCM position component)
                 listOfDoubleSupportTrajectories.append(doubleSupportTrajectory)
 
         #In the following part we will replace the double support trajectories for the corresponding double support time-window  in the preliminary DCM trajectory
