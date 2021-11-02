@@ -59,7 +59,7 @@ class DCMTrajectoryGenerator:
 
         #rempli par moi
         for index in range(np.size(self.CoP,0)-2,-1,-1):
-            self.DCMForEndOfStep[index] = self.CoP[index+1] + (self.DCMForEndOfStep[index+1] - self.CoP[index+1])*np.exp(-self.omega*self.stepDuration)#equation 7 of the jupyter notebook
+            self.DCMForEndOfStep[index] = self.CoP[index+1] + (self.DCMForEndOfStep[index+1] - self.CoP[index+1])*math.exp(-self.omega*self.stepDuration)#equation 7 of the jupyter notebook
         pass
 
     def calculateCoPTrajectory(self):
@@ -82,7 +82,7 @@ class DCMTrajectoryGenerator:
             time = iter*self.timeStep  #Finding the time of a corresponding control cycle
             i = int(time/self.stepDuration) #Finding the number of corresponding step of walking
             t = time%self.stepDuration #The “internal” step time t is reset at the beginning of each step
-            self.DCM.append(self.CoP[i]+(self.DCMForEndOfStep[i]-self.CoP[i])*exp(self.omega(t-self.stepDuration))) #Use equation (9) for finding the DCM trajectory
+            self.DCM.append(self.CoP[i]+(self.DCMForEndOfStep[i]-self.CoP[i])*math.exp(self.omega*(t-self.stepDuration))) #Use equation (9) for finding the DCM trajectory
             
             #rempli par moi
             #faire corriger, je ne suis pas sûr
@@ -97,14 +97,14 @@ class DCMTrajectoryGenerator:
         for stepNumber in range(np.size(self.CoP,0)):
             if stepNumber == 0: #Boundary conditions of double support for the first step(equation 11b and 12b in Jupyter notebook)
                 self.initialDCMForDS[stepNumber] = self.DCM[stepNumber] #At the first step the initial dcm for double support is equal to the general initial DCM position, use (11b)
-                self.finalDCMForDS[stepNumber] = self.CoP[stepNumber] + (self.initialDCMForDS[stepNumber] - self.CoP[stepNumber])*exp(self.omega*(1-self.alpha)*self.dsTime) # use (12b)
+                self.finalDCMForDS[stepNumber] = self.CoP[stepNumber] + (self.initialDCMForDS[stepNumber] - self.CoP[stepNumber])*math.exp(self.omega*(1-self.alpha)*self.dsTime) # use (12b)
                 self.initialDCMVelocityForDS[stepNumber] = self.omega*(self.initialDCMForDS[stepNumber] - self.CoP[stepNumber]) #You can find DCM velocity at each time by having DCM position for that time and the corresponding CoP position, see equation (4)
                 self.finalDCMVelocityForDS[stepNumber] = self.omega*(self.finalDCMForDS[stepNumber] - self.CoP[stepNumber])#You can find DCM velocity at each time by having DCM position for that time and the corresponding CoP position, see euqation (4))
                 
                 #rempli par moi
             else: #Boundary conditions of double support for all steps except first step((equation 11 and 12 in Jupyter notebook))
-                self.initialDCMForDS[stepNumber] = self.CoP[stepNumber-1] + (self.DCMForEndOfStep[stepNumber-1] - self.CoP[stepNumber-1])*exp(-self.omega*self.alpha*self.dsTime) #use equation(11)
-                self.finalDCMForDS[stepNumber] = self.CoP[stepNumber] + (self.DCMForEndOfStep[stepNumber-1] - self.CoP[stepNumber])*exp(self.omega*(1-self.alpha)*self.dsTime) #use equation(12)
+                self.initialDCMForDS[stepNumber] = self.CoP[stepNumber-1] + (self.DCMForEndOfStep[stepNumber-1] - self.CoP[stepNumber-1])*math.exp(-self.omega*self.alpha*self.dsTime) #use equation(11)
+                self.finalDCMForDS[stepNumber] = self.CoP[stepNumber] + (self.DCMForEndOfStep[stepNumber-1] - self.CoP[stepNumber])*math.exp(self.omega*(1-self.alpha)*self.dsTime) #use equation(12)
                 self.initialDCMVelocityForDS[stepNumber] = self.omega*(self.initialDCMForDS[stepNumber] - self.CoP[stepNumber]) #You can find DCM velocity at each time by having DCM position for that time and the corresponding CoP position, see euqation (4)
                 self.finalDCMVelocityForDS[stepNumber] = self.omega*(self.finalDCMForDS[stepNumber] - self.CoP[stepNumber])  #You can find DCM velocity at each time by having DCM position for that time and the corresponding CoP position, see euqation (4)
 
