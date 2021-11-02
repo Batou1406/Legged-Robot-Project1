@@ -36,9 +36,7 @@ class DCMTrajectoryGenerator:
             self.CoMDot[kk+1]= self.omega*(self.DCM[kk]-self.CoM[kk]) #equation (3) in jupyter notebook
             self.CoM[kk+1]= self.ComDot[kk+1]*self.timeStep+self.CoM[kk] #Simple euler numerical integration
 
-            #rempli par moi
-            #commentaire test pour Gab
-            
+            #rempli par moi           
             # Qu'est-ce qu'on doit mettre comme indice pour avoir le DCM (epsilon)?
             # Ici, on ne calcule pas la dérivée au temps kk mais kk-1, pourquoi ? ie. la formule CoMDot = omega*(DCM - COM)
             self.CoM[kk+1][2]=self.CoMHeight
