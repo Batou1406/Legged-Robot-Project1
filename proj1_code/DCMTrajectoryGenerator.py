@@ -126,13 +126,13 @@ class DCMTrajectoryGenerator:
         doubleSupportInterpolationCoefficients = list('')
         for stepNumber in range(np.size(self.CoP,0)):
             if(stepNumber==0):
-                doubleSupportInterpolationCoefficients.append(              ) #Create a vector of DCM Coeffient by using the doInterpolationForDoubleSupport function. Note that the double support duration for first step is not the same as other steps 
+                doubleSupportInterpolationCoefficients.append(doInterpolationForDoubleSupport(self,self.initialDCMForDS, self.finalDCMForDS, self.initialDCMVelocityForDS, self.finalDCMVelocityForDS, self.dsTime)) #Create a vector of DCM Coeffient by using the doInterpolationForDoubleSupport function. Note that the double support duration for first step is not the same as other steps 
             else:
-                doubleSupportInterpolationCoefficients.append(              )         
+                doubleSupportInterpolationCoefficients.append(doInterpolationForDoubleSupport(self,self.initialDCMForDS, self.finalDCMForDS, self.initialDCMVelocityForDS, self.finalDCMVelocityForDS, self.dsTime))         
         #In the following part we will find the list of double support trajectories for all steps of walking
         listOfDoubleSupportTrajectories = list('')
         for stepNumber in range(np.size(self.CoP,0)):
-            a, b, c, d = doInterpolationForDoubleSupport(self, initialDCMForDS, finalDCMForDS, initialDCMVelocityForDS, finalDCMVelocityForDS,dsTime) #use doubleSupportInterpolationCoefficients vector
+            a, b, c, d = doubleSupportInterpolationCoefficients[stepNumber] #use doubleSupportInterpolationCoefficients vector
             if(stepNumber==0):#notice double support duration is not the same as other steps
                 doubleSupportTrajectory = np.zeros((int((1-self.alpha)*self.dsTime*(1/self.timeStep)),3))
                 for t in range(int((1-self.alpha)*self.dsTime*(1/self.timeStep))):
