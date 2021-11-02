@@ -33,12 +33,14 @@ class DCMTrajectoryGenerator:
         self.CoM[0] = com_ini
         self.CoMDot[0] = 0
         for kk in range(0,self.CoM.shape[0]-1):
-            self.CoMDot[kk+1]= self.omega*(self.DCM[kk]-self.CoM[kk]) #equation (3) in jupyter notebook
-            self.CoM[kk+1]= self.ComDot[kk+1]*self.timeStep+self.CoM[kk] #Simple euler numerical integration
 
             #rempli par moi           
             # Qu'est-ce qu'on doit mettre comme indice pour avoir le DCM (epsilon)?
-            # Ici, on ne calcule pas la dérivée au temps kk mais kk-1, pourquoi ? ie. la formule CoMDot = omega*(DCM - COM)
+            #self.DCM est un tableau avec les coordonnées (x,y,z) dans les lignes (vecteur ligne) et tous les sample du premier au premier pas juqu'au dernier au dernier pas dans les colones..
+            # ie.[ 3; N sample]
+            # Ici, on ne calcule pas la dérivée au temps kk+1 mais kk ! ça marche très bien, mais attention de ne pas confondre
+            self.CoMDot[kk+1]= self.omega*(self.DCM[kk]-self.CoM[kk]) #equation (3) in jupyter notebook
+            self.CoM[kk+1]= self.ComDot[kk+1]*self.timeStep+self.CoM[kk] #Simple euler numerical integration
             self.CoM[kk+1][2]=self.CoMHeight
         return self.CoM
 
@@ -70,7 +72,7 @@ class DCMTrajectoryGenerator:
         for kk in range(0,self.CoM.shape[0]-1):
 
             #rempli par moi
-            #pourquoi ça plutôt que : self.omega*(self.DCM[kk+1]-self.CoP[kk+1])
+            #pourquoi ça plutôt que : self.omega*(self.DCM[kk+1]-self.CoP[kk+1]) (ie. eq4) -> c'est juste avec la numerical differentation, difference minim.
             self.DCMVelocity[kk+1]=  (self.DCM[kk+1] - self.DCM[kk])/(self.timeStep)#Numerical differentiation for solving DCM Velocity
             self.CoPTrajectory[kk+1]= self.DCM[kk+1] - (self.DCMVelocity[kk+1]/self.omega)#Use equation (10) to find CoP by having DCM and DCM Velocity
 
