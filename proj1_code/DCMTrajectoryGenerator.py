@@ -40,7 +40,7 @@ class DCMTrajectoryGenerator:
             # ie.[ 3; N sample]
             # Ici, on ne calcule pas la dérivée au temps kk+1 mais kk ! ça marche très bien, mais attention de ne pas confondre
             self.CoMDot[kk+1]= self.omega*(self.DCM[kk]-self.CoM[kk]) #equation (3) in jupyter notebook
-            self.CoM[kk+1]= self.ComDot[kk+1]*self.timeStep+self.CoM[kk] #Simple euler numerical integration
+            self.CoM[kk+1]= self.CoMDot[kk+1]*self.timeStep+self.CoM[kk] #Simple euler numerical integration
             self.CoM[kk+1][2]=self.CoMHeight
         return self.CoM
 
@@ -137,12 +137,14 @@ class DCMTrajectoryGenerator:
             if(stepNumber==0):#notice double support duration is not the same as other steps
                 doubleSupportTrajectory = np.zeros((int((1-self.alpha)*self.dsTime*(1/self.timeStep)),3))
                 for t in range(int((1-self.alpha)*self.dsTime*(1/self.timeStep))):
-                    doubleSupportTrajectory[t] = (a*(t**3) + b*(t**2) + t*c + d) #use equation 16 (only the DCM position component)
+                    realT = t*self.timeStep
+                    doubleSupportTrajectory[t] = (a*(realT**3) + b*(realT**2) + realT*c + d) #use equation 16 (only the DCM position component)
                 listOfDoubleSupportTrajectories.append(doubleSupportTrajectory)
             else:
                 doubleSupportTrajectory = np.zeros((int(self.dsTime*(1/self.timeStep)),3))
                 for t in range(int(self.dsTime*(1/self.timeStep))):
-                    doubleSupportTrajectory[t] = pow(t,3)*a + pow(t,2)*b + t*c + d#use equation 16 (only the DCM position component)
+                    # ATTENTION ! CE N'EST SUREMENT PAS LES MÊMES T, UN EST L'INDICE, L'AUTRE LE TEMPS
+                    doubleSupportTrajectory[t] = (t**3)*a + (t**2)*b + t*c + d#use equation 16 (only the DCM position component)
                 listOfDoubleSupportTrajectories.append(doubleSupportTrajectory)
 
         #In the following part we will replace the double support trajectories for the corresponding double support time-window  in the preliminary DCM trajectory
@@ -153,8 +155,8 @@ class DCMTrajectoryGenerator:
                 #the first step starts with double support and notice double support duration is not the same as other steps
                 DCMCompleteTrajectory[0:int((1-self.alpha)*self.dsTime*(1/self.timeStep))] = listOfDoubleSupportTrajectories[stepNumber][:]#fill the corresponding interval for DCM index for double support part
             else: 
-                DCMCompleteTrajectory[(int(stepNumber*self.stepDuration - (self.alpha)*self.dsTime*(1/self.timeStep))):
-                                      (int(stepNumber*self.stepDuration + (1-self.alpha)*self.dsTime*(1/self.timeStep)))] = listOfDoubleSupportTrajectories[stepNumber][:]
+                DCMCompleteTrajectory[(int((stepNumber*self.stepDuration - (self.alpha*self.dsTime))/self.timeStep)):
+                                      (int((stepNumber*self.stepDuration + ((1-self.alpha)*self.dsTime))/self.timeStep))] = listOfDoubleSupportTrajectories[stepNumber][:]
         
         self.DCM = DCMCompleteTrajectory
         temp = np.array(self.DCM)
